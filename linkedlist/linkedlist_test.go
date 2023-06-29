@@ -8,7 +8,7 @@ import (
 
 func TestLinkedList(t *testing.T) {
 	t.Run("edge cases", func(t *testing.T) {
-		ll := New()
+		ll := New[int]()
 
 		v, err := ll.Pop()
 		assert.Equal(t, v, 0)
@@ -20,7 +20,7 @@ func TestLinkedList(t *testing.T) {
 	})
 
 	t.Run("test success", func(t *testing.T) {
-		ll := New()
+		ll := New[int]()
 		ll.Push(1)
 		ll.Push(2)
 		ll.Push(3)
@@ -49,7 +49,7 @@ func TestLinkedList(t *testing.T) {
 }
 
 func TestLinkedList_PopNth(t *testing.T) {
-	ll := New()
+	ll := New[int]()
 	ll.Push(1)
 	ll.Push(2)
 	ll.Push(3)
@@ -78,4 +78,6 @@ func TestLinkedList_PopNth(t *testing.T) {
 	v, err = ll.Pop()
 	assert.Equal(t, 0, v)
 	assert.ErrorContains(t, err, "empty")
+
+	assert.Zero(t, ll.Len())
 }

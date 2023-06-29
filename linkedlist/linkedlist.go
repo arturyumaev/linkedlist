@@ -2,29 +2,29 @@ package linkedlist
 
 import "errors"
 
-type ILinkedList interface {
-	Push(data int)
-	Pop() (int, error)
-	PopNth(n int) (int, error)
+type ILinkedList[T any] interface {
+	Push(data T)
+	Pop() (T, error)
+	PopNth(n int) (T, error)
 	Len() int
 }
 
-type node struct {
-	data int
-	next *node
+type node[T any] struct {
+	data T
+	next *node[T]
 }
 
-type linkedlist struct {
-	head *node // node.next -> node.next -> node.next -> nil
+type linkedlist[T any] struct {
+	head *node[T] // node.next -> node.next -> node.next -> nil
 	len  int
 }
 
-func (ll *linkedlist) Push(data int) {
+func (ll *linkedlist[T]) Push(data T) {
 	defer func() {
 		ll.len++
 	}()
 
-	nextNode := &node{
+	nextNode := &node[T]{
 		data: data,
 		next: nil,
 	}
@@ -42,17 +42,19 @@ func (ll *linkedlist) Push(data int) {
 	}
 }
 
-func (ll *linkedlist) Pop() (int, error) {
+func (ll *linkedlist[T]) Pop() (T, error) {
 	return ll.PopNth(ll.len - 1)
 }
 
-func (ll *linkedlist) PopNth(n int) (int, error) {
+func (ll *linkedlist[T]) PopNth(n int) (T, error) {
+	var defaultValue T
+
 	if ll.len == 0 {
-		return 0, errors.New("linked list is empty")
+		return defaultValue, errors.New("linked list is empty")
 	}
 
 	if n < 0 || n >= ll.len {
-		return 0, errors.New("n is outside of range")
+		return defaultValue, errors.New("n is outside of range")
 	}
 
 	if ll.len == 1 {
@@ -73,10 +75,10 @@ func (ll *linkedlist) PopNth(n int) (int, error) {
 	return data, nil
 }
 
-func (ll *linkedlist) Len() int {
+func (ll *linkedlist[T]) Len() int {
 	return ll.len
 }
 
-func New() ILinkedList {
-	return &linkedlist{}
+func New[T any]() ILinkedList[T] {
+	return &linkedlist[T]{}
 }
