@@ -47,3 +47,35 @@ func TestLinkedList(t *testing.T) {
 		assert.Equal(t, 0, ll.Len())
 	})
 }
+
+func TestLinkedList_PopNth(t *testing.T) {
+	ll := New()
+	ll.Push(1)
+	ll.Push(2)
+	ll.Push(3)
+	ll.Push(4)
+
+	v, err := ll.PopNth(2)
+	assert.Equal(t, 3, v)
+	assert.NoError(t, err)
+
+	v, err = ll.PopNth(2)
+	assert.Equal(t, 4, v)
+	assert.NoError(t, err)
+
+	v, err = ll.PopNth(2)
+	assert.Equal(t, 0, v)
+	assert.ErrorContains(t, err, "range")
+
+	v, err = ll.Pop()
+	assert.Equal(t, 2, v)
+	assert.NoError(t, err)
+
+	v, err = ll.Pop()
+	assert.Equal(t, 1, v)
+	assert.NoError(t, err)
+
+	v, err = ll.Pop()
+	assert.Equal(t, 0, v)
+	assert.ErrorContains(t, err, "empty")
+}
