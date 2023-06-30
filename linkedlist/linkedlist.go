@@ -1,11 +1,14 @@
 package linkedlist
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"sync"
+)
 
 type ILinkedList[T any] interface {
 	Push(data T)
 	Pop() (T, error)
-	PopNth(n int) (T, error)
 	Len() int
 }
 
@@ -15,19 +18,19 @@ type node[T any] struct {
 }
 
 type linkedlist[T any] struct {
-	head *node[T] // node.next -> node.next -> node.next -> nil
+	head *node[T]
 	len  int
+	mu   *sync.RWMutex
 }
 
 func (ll *linkedlist[T]) Push(data T) {
-	defer func() {
-		ll.len++
-	}()
-
 	nextNode := &node[T]{
 		data: data,
 		next: nil,
 	}
+
+	ll.mu.Lock()
+	defer ll.mu.Unlock()
 
 	if ll.head == nil {
 		ll.head = nextNode
@@ -40,24 +43,23 @@ func (ll *linkedlist[T]) Push(data T) {
 
 		currNode.next = nextNode
 	}
+
+	ll.len++
 }
 
 func (ll *linkedlist[T]) Pop() (T, error) {
-	return ll.PopNth(ll.len - 1)
-}
+	ll.mu.Lock()
+	defer ll.mu.Unlock()
 
-func (ll *linkedlist[T]) PopNth(n int) (T, error) {
 	var defaultValue T
+	currentLen := ll.len
 
-	if ll.len == 0 {
+	if currentLen == 0 {
+		fmt.Println("HERE empty")
 		return defaultValue, errors.New("linked list is empty")
 	}
 
-	if n < 0 || n >= ll.len {
-		return defaultValue, errors.New("n is outside of range")
-	}
-
-	if ll.len == 1 {
+	if currentLen == 1 {
 		data := ll.head.data
 		ll.head = nil
 		ll.len--
@@ -65,20 +67,25 @@ func (ll *linkedlist[T]) PopNth(n int) (T, error) {
 	}
 
 	currNode := ll.head
-	for c := 0; c < n-1; c++ {
+	for currNode.next.next != nil {
 		currNode = currNode.next
 	}
 	data := currNode.next.data
-	currNode.next = currNode.next.next
+	currNode.next = nil
 	ll.len--
 
 	return data, nil
 }
 
 func (ll *linkedlist[T]) Len() int {
-	return ll.len
+	ll.mu.RLock()
+	len := ll.len
+	ll.mu.RUnlock()
+	return len
 }
 
 func New[T any]() ILinkedList[T] {
-	return &linkedlist[T]{}
+	return &linkedlist[T]{
+		mu: &sync.RWMutex{},
+	}
 }
