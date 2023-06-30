@@ -18,7 +18,6 @@ func main() {
 		go func() {
 			defer wg.Done()
 
-			fmt.Println("pushing")
 			ll.Push(i)
 		}()
 	}
@@ -27,7 +26,6 @@ func main() {
 		go func() {
 			defer wg.Done()
 
-			fmt.Println("popping")
 			ll.Pop()
 		}()
 	}

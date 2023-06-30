@@ -2,7 +2,6 @@ package linkedlist
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -55,7 +54,6 @@ func (ll *linkedlist[T]) Pop() (T, error) {
 	currentLen := ll.len
 
 	if currentLen == 0 {
-		fmt.Println("HERE empty")
 		return defaultValue, errors.New("linked list is empty")
 	}
 
